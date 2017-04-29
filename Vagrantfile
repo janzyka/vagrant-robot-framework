@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ubuntu/trusty32"
+  config.vm.box = "ubuntu/trusty64"
 
   config.vm.hostname = "robot-framework.local"
 
@@ -22,11 +22,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
-  #config.vm.network "forwarded_port", guest: 80, host: 8000
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.97.101"
+  config.vm.network "private_network", type: "dhcp"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -55,6 +55,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Use VBoxManage to customize the VM. For example to change memory:
     vb.customize ["modifyvm", :id, "--memory", "1024"]
+    vb.customize ["modifyvm", :id, "--vram", "256"]    
   end
   #
   # View the documentation for the provider you're using for more
@@ -66,6 +67,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   paths.map do |path|
     config.vm.provision :shell, :inline => "echo Run #{path} ..."
     config.vm.provision :shell, :path => path
+  end
+
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+     config.proxy.http     = "http://uswhsc88.merck.com:8080"
+     config.proxy.https    = "http://uswhsc88.merck.com:8080"
+     config.proxy.no_proxy = "localhost,127.0.0.1"
   end
 
   # Enable provisioning with CFEngine. CFEngine Community packages are
